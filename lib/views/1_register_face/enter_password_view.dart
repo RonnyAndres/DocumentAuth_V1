@@ -1,9 +1,4 @@
-import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:documentauth/firebase_options.dart';
-import 'package:firebase_core/firebase_core.dart';
-import 'package:flutter/material.dart';
-import 'package:documentauth/views/1_register_face/register_face_view.dart';
-import 'package:documentauth/model/password_model.dart';
+// ignore_for_file: unused_field
 
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:documentauth/firebase_options.dart';

@@ -1,14 +1,26 @@
+// ignore_for_file: non_constant_identifier_names
+
 class UserModel {
   String? id;
   String? name;
-  String? image;
+  String? cedula;
+  String? correo;
+  String? telefono;
+  String? direccion;
+  String? image_face;
+  String? image_firma;
   FaceFeatures? faceFeatures;
   int? registeredOn;
 
   UserModel({
     this.id,
     this.name,
-    this.image,
+    this.cedula,
+    this.correo,
+    this.telefono,
+    this.direccion,
+    this.image_firma,
+    this.image_face,
     this.faceFeatures,
     this.registeredOn,
   });
@@ -17,7 +29,12 @@ class UserModel {
     return UserModel(
       id: json['id'],
       name: json['name'],
-      image: json['image'],
+      cedula: json['cedula'],
+      correo: json['correo'],
+      telefono: json['telefono'],
+      direccion: json['direccion'],
+      image_face: json['image'],
+      image_firma: json['image_firma'],
       faceFeatures: FaceFeatures.fromJson(json["faceFeatures"]),
       registeredOn: json['registeredOn'],
     );
@@ -27,7 +44,12 @@ class UserModel {
     return {
       'id': id,
       'name': name,
-      'image': image,
+      'cedula': cedula,
+      'correo': correo,
+      'telefono': telefono,
+      'direccion': direccion,
+      'image': image_face,
+      'image_firma': image_firma,
       'faceFeatures': faceFeatures?.toJson() ?? {},
       'registeredOn': registeredOn,
     };

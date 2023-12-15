@@ -1,7 +1,14 @@
+import 'package:documentauth/common/utils/custom_snackbar.dart';
 import 'package:documentauth/common/utils/extensions/size_extension.dart';
+import 'package:documentauth/common/utils/screen_size_util.dart';
 import 'package:documentauth/constants/theme.dart';
 import 'package:documentauth/model/user_model.dart';
 import 'package:flutter/material.dart';
+
+void initializeUtilContexts(BuildContext context) {
+  ScreenSizeUtil.context = context;
+  CustomSnackBar.context = context;
+}
 
 class UserDetailsView extends StatelessWidget {
   final UserModel user;
@@ -10,58 +17,36 @@ class UserDetailsView extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      extendBodyBehindAppBar: true,
       appBar: AppBar(
         centerTitle: true,
-        backgroundColor: appBarColor,
-        title: const Text("Authenticated!!!"),
-        elevation: 0,
+        title: Text("Authenticated"),
       ),
-      body: Container(
-        decoration: const BoxDecoration(
-          gradient: LinearGradient(
-            begin: Alignment.topCenter,
-            end: Alignment.bottomCenter,
-            colors: [
-              scaffoldTopGradientClr,
-              scaffoldBottomGradientClr,
-            ],
-          ),
-        ),
-        child: Center(
+      body: Center(
+        child: Padding(
+          padding: EdgeInsets.all(16.0),
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             crossAxisAlignment: CrossAxisAlignment.center,
             children: [
-              const CircleAvatar(
-                radius: 42,
-                backgroundColor: primaryWhite,
-                child: CircleAvatar(
-                  radius: 40,
-                  backgroundColor: accentColor,
-                  child: Icon(
-                    Icons.check,
-                    color: primaryWhite,
-                    size: 44,
-                  ),
-                ),
+              Icon(
+                Icons.check_circle_outline,
+                color: Colors.green,
+                size: 80,
               ),
-              SizedBox(height: 0.025.sh),
+              SizedBox(height: 20),
               Text(
-                "Hey ${user.name} !",
-                style: const TextStyle(
-                  fontWeight: FontWeight.w600,
-                  fontSize: 26,
-                  color: textColor,
-                ),
-              ),
-              const SizedBox(height: 8),
-              Text(
-                "You are Successfully Authenticated !",
+                "Hey ${user.name}!",
                 style: TextStyle(
-                  fontWeight: FontWeight.w400,
+                  fontWeight: FontWeight.bold,
+                  fontSize: 24,
+                ),
+              ),
+              SizedBox(height: 10),
+              Text(
+                "You are Successfully Authenticated",
+                style: TextStyle(
                   fontSize: 18,
-                  color: textColor.withOpacity(0.6),
+                  color: Colors.grey[600],
                 ),
               ),
             ],

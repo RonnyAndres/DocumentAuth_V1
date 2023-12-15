@@ -1,9 +1,10 @@
 import 'dart:convert';
 import 'dart:developer';
 import 'dart:math' as math;
-
 import 'package:audioplayers/audioplayers.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:documentauth/common/utils/screen_size_util.dart';
+import 'package:documentauth/firebase_options.dart';
 import 'package:documentauth/views/2_authenticate_face/scanning_animation/animated_view.dart';
 import 'package:documentauth/views/2_authenticate_face/user_details_view.dart';
 import 'package:documentauth/common/utils/custom_snackbar.dart';
@@ -17,12 +18,22 @@ import 'package:flutter/services.dart';
 import 'package:flutter_face_api/face_api.dart' as regula;
 import 'package:flutter/material.dart';
 import 'package:google_mlkit_face_detection/google_mlkit_face_detection.dart';
+import 'package:firebase_core/firebase_core.dart';
 
 class AuthenticateFaceView extends StatefulWidget {
   const AuthenticateFaceView({Key? key}) : super(key: key);
 
   @override
   State<AuthenticateFaceView> createState() => _AuthenticateFaceViewState();
+}
+
+void initializeUtilContexts(BuildContext context) {
+  ScreenSizeUtil.context = context;
+  CustomSnackBar.context = context;
+  // Inizializar Firebase
+  Firebase.initializeApp(
+    options: DefaultFirebaseOptions.currentPlatform,
+  );
 }
 
 class _AuthenticateFaceViewState extends State<AuthenticateFaceView> {
@@ -46,10 +57,14 @@ class _AuthenticateFaceViewState extends State<AuthenticateFaceView> {
   bool isMatching = false;
   int trialNumber = 1;
 
+  get timer => null;
+
   @override
   void dispose() {
     _faceDetector.close();
     _audioPlayer.dispose();
+    timer?.cancel();
+    super.dispose();
     super.dispose();
   }
 
@@ -64,11 +79,12 @@ class _AuthenticateFaceViewState extends State<AuthenticateFaceView> {
 
   @override
   Widget build(BuildContext context) {
+    initializeUtilContexts(context);
+
     return Scaffold(
       extendBodyBehindAppBar: true,
       appBar: AppBar(
         centerTitle: true,
-        backgroundColor: appBarColor,
         title: const Text("Authenticate Face"),
         elevation: 0,
       ),
@@ -78,16 +94,6 @@ class _AuthenticateFaceViewState extends State<AuthenticateFaceView> {
             Container(
               width: constrains.maxWidth,
               height: constrains.maxHeight,
-              decoration: const BoxDecoration(
-                gradient: LinearGradient(
-                  begin: Alignment.topCenter,
-                  end: Alignment.bottomCenter,
-                  colors: [
-                    scaffoldTopGradientClr,
-                    scaffoldBottomGradientClr,
-                  ],
-                ),
-              ),
             ),
             Align(
               alignment: Alignment.bottomCenter,
@@ -100,13 +106,6 @@ class _AuthenticateFaceViewState extends State<AuthenticateFaceView> {
                       width: double.infinity,
                       padding:
                           EdgeInsets.fromLTRB(0.05.sw, 0.025.sh, 0.05.sw, 0),
-                      decoration: BoxDecoration(
-                        color: overlayContainerClr,
-                        borderRadius: BorderRadius.only(
-                          topLeft: Radius.circular(0.03.sh),
-                          topRight: Radius.circular(0.03.sh),
-                        ),
-                      ),
                       child: Column(
                         children: [
                           Stack(
@@ -138,7 +137,6 @@ class _AuthenticateFaceViewState extends State<AuthenticateFaceView> {
                               text: "Authenticate",
                               onTap: () {
                                 setState(() => isMatching = true);
-                                _playScanningAudio;
                                 _fetchUsersAndMatchFace();
                               },
                             ),
@@ -212,7 +210,6 @@ class _AuthenticateFaceViewState extends State<AuthenticateFaceView> {
     FirebaseFirestore.instance.collection("users").get().catchError((e) {
       log("Getting User Error: $e");
       setState(() => isMatching = false);
-      _playFailedAudio;
       CustomSnackBar.errorSnackBar("Something went wrong. Please try again.");
     }).then((snap) {
       if (snap.docs.isNotEmpty) {
@@ -247,7 +244,7 @@ class _AuthenticateFaceViewState extends State<AuthenticateFaceView> {
   _matchFaces() async {
     bool faceMatched = false;
     for (List user in users) {
-      image1.bitmap = (user.first as UserModel).image;
+      image1.bitmap = (user.first as UserModel).image_face;
       image1.imageType = regula.ImageType.PRINTED;
 
       //Face comparing logic.
@@ -286,9 +283,13 @@ class _AuthenticateFaceViewState extends State<AuthenticateFaceView> {
         });
 
         if (mounted) {
+          // ignore: avoid_print
+          print("User: ${loggingUser!.name}");
           Navigator.of(context).push(
             MaterialPageRoute(
               builder: (context) => UserDetailsView(user: loggingUser!),
+
+              // Imprimir por consola el nombre del usuario
             ),
           );
         }
@@ -307,7 +308,7 @@ class _AuthenticateFaceViewState extends State<AuthenticateFaceView> {
         //will be shown. After entering the name the face registered with the entered name will
         //be fetched and will try to match it with the to be authenticated face.
         //If the faces match, Viola!. Else it means the user is not registered yet.
-        _audioPlayer.stop();
+
         setState(() {
           isMatching = false;
           trialNumber++;
@@ -321,22 +322,6 @@ class _AuthenticateFaceViewState extends State<AuthenticateFaceView> {
                 content: TextFormField(
                   controller: _nameController,
                   cursorColor: accentColor,
-                  decoration: InputDecoration(
-                    enabledBorder: OutlineInputBorder(
-                      borderSide: const BorderSide(
-                        width: 2,
-                        color: accentColor,
-                      ),
-                      borderRadius: BorderRadius.circular(4),
-                    ),
-                    focusedBorder: OutlineInputBorder(
-                      borderSide: const BorderSide(
-                        width: 2,
-                        color: accentColor,
-                      ),
-                      borderRadius: BorderRadius.circular(4),
-                    ),
-                  ),
                 ),
                 actions: [
                   TextButton(
@@ -379,7 +364,6 @@ class _AuthenticateFaceViewState extends State<AuthenticateFaceView> {
         .catchError((e) {
       log("Getting User Error: $e");
       setState(() => isMatching = false);
-      _playFailedAudio;
       CustomSnackBar.errorSnackBar("Something went wrong. Please try again.");
     }).then((snap) {
       if (snap.docs.isNotEmpty) {

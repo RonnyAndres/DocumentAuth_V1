@@ -39,6 +39,7 @@ dependencies:
   google_mlkit_face_detection: ^0.5.0
   audioplayers: ^3.0.1
   lottie: ^2.7.0
+  signature: ^5.2.1
 
 
   # The following adds the Cupertino Icons font to your application.
@@ -70,6 +71,9 @@ flutter:
   # To add assets to your application, add an assets section, like this:
   assets:
     - images/
+    - assets/success.mp3
+    - assets/failed.mp3
+    - assets/scan_beep.wav
 
   # An image asset can refer to one or more resolution-specific "variants", see
   # https://flutter.dev/assets-and-images/#resolution-aware

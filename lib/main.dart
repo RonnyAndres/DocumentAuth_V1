@@ -1,8 +1,10 @@
+// ignore_for_file: unused_import, duplicate_import
+
+import 'package:documentauth/common/utils/custom_snackbar.dart';
+import 'package:documentauth/common/utils/screen_size_util.dart';
 import 'package:documentauth/views/0_splash_screen/splash_screen.dart';
 import 'package:documentauth/views/1_register_face/enter_password_view.dart';
 import 'package:flutter/material.dart';
-// Import register face view
-import 'package:documentauth/views/1_register_face/enter_password_view.dart';
 
 void main() {
   runApp(const MyApp());
